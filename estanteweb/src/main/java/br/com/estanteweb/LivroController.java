@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -62,31 +61,6 @@ public class LivroController {
     @ResponseBody
     public String quemAcessa(@RequestHeader("User-Agent") String userAgent){
         return "Requisição recebida de: " + userAgent;
-    }
-
-    @GetMapping(value = "/contato", produces = "text/html")
-    public String formContato() {
-        return "<form method=\"post\" action=\"/contato\">"
-                + "<label>Nome: <input type=\"text\" name=\"nome\"></label>"
-                + "<label>Mensagem: <input type=\"text\" name=\"mensagem\"></label>"
-                + "<button type=\"submit\">Enviar mensagem</button>"
-                + "</form>";
-    }
-
-    @PostMapping("/contato")
-    public ResponseEntity<String> formContato(
-            @RequestParam String nome,
-            @RequestParam String mensagem) {
-
-        if (mensagem == null || mensagem.isBlank()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Erro: a mensagem não pode estar em branco.");
-        }
-
-        return ResponseEntity.ok(
-                "Obrigado, " + nome + "! Sua mensagem foi recebida."
-        );
     }
 
 }

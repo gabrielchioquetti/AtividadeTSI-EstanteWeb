@@ -1,51 +1,42 @@
 package br.com.estanteweb;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class SugestaoController {
     private SugestaoRepository sugestaoRepository = new SugestaoRepository();
 
-    @GetMapping(value = "/sugestoes/nova", produces = "text/html")
-    @ResponseBody
+    @GetMapping("/sugestoes/nova")
     public String novaSugestao() {
-        return "<form method=\"post\" action=\"/sugestoes\">"
-                + "<label>Nome do cliente: "
-                + "<input type=\"text\" name=\"nomeCliente\">"
-                + "</label><br>"
-                + "<label>Livro sugerido: "
-                + "<input type=\"text\" name=\"livroSugerido\">"
-                + "</label><br>"
-                + "<button type=\"submit\">Enviar sugestão</button>"
-                + "</form>";
+        return "sugestao-nova";
     }
 
     @PostMapping("/sugestoes")
-    public ResponseEntity<String> adicionarSugestao(
+    public String adicionarSugestao(
+            Model model,
             @RequestParam String nomeCliente,
             @RequestParam String livroSugerido) {
-
+        
+        if(nomeCliente.isBlank() || livroSugerido.isBlank()){
+            model.addAttribute("erro", "Nome do cliente ou Livro sugerido em branco!!!");
+            model.addAttribute("nomeCliente", nomeCliente);
+            model.addAttribute("livroSugerido", livroSugerido);
+            return "sugestao-nova";
+        }
         Sugestao sugestao = new Sugestao(nomeCliente, livroSugerido);
 
         sugestaoRepository.adicionar(sugestao);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .header("X-Total-Sugestoes",
-                        String.valueOf(sugestaoRepository.total()))
-                .body("Sugestão recebida com sucesso!");
+        return "redirect:/sugestoes?enviada=true";
     }
 
-    @GetMapping(value = "/sugestoes")
-    public String listarSugestoes(Model model) {
-
+    @GetMapping("/sugestoes")
+    public String listarSugestoes(Model model, @RequestParam(required = false) Boolean enviada) {
+        model.addAttribute("enviada", enviada);
         model.addAttribute("sugestoes", sugestaoRepository.listarTodas());
 
         return "sugestoes";
