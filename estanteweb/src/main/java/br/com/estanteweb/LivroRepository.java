@@ -1,29 +1,49 @@
 package br.com.estanteweb;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+@Repository
 public class LivroRepository {
-    private List<Livro> livros = List.of(
-        new Livro("Dom Casmurro", "Machado de Assis", 1899, 15.00),
-        new Livro("1984", "George Orwell", 1949, 35.00),
-        new Livro("O Pequeno Príncipe", "Antoine de Saint-Exupéry", 1943, 20.00),
-        new Livro("O Alquimista", "Paulo Coelho", 1988, 40.00),
-        new Livro("Uma Breve História da Humanidade", "Yuval Noah Harari", 2011, 60.00),
-        new Livro("O <b>Grande</b> Gatsby", "Teste", 2026, 100.00)
-    );
 
-    public List<Livro> listarTodos(){
-        return livros;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    public List<Livro> listarTodos() {
+        String sql = "SELECT * FROM livro";
+        List<Map<String, Object>> linhas = jdbcTemplate.queryForList(sql);
+
+        List<Livro> resultado = new ArrayList<>();
+        for (Map<String, Object> linha : linhas) {
+            resultado.add(Livro.deMap(linha));
+        }
+        return resultado;
     }
 
-    public int contarLivros(){
-        return livros.size();
+    public int contarLivros() {
+        String sql = "SELECT COUNT(*) FROM livro";
+        Integer total = jdbcTemplate.queryForObject(sql, Integer.class);
+        return total != null ? total : 0;
     }
 
     public List<Livro> listarAtePreco(double precoMaximo) {
-    return livros.stream()
-                 .filter(livro -> livro.getPreco() <= precoMaximo)
-                 .toList();
+        String sql = "SELECT * FROM livro WHERE preco <= ?";
+        List<Map<String, Object>> linhas = jdbcTemplate.queryForList(sql, precoMaximo);
+
+        List<Livro> resultado = new ArrayList<>();
+        for (Map<String, Object> linha : linhas) {
+            resultado.add(Livro.deMap(linha));
+        }
+        return resultado;
     }
 
+    public Double somarValorAcervo() {
+        String sql = "SELECT SUM(preco) FROM livro";
+        return jdbcTemplate.queryForObject(sql, Double.class);
+    }
 }
