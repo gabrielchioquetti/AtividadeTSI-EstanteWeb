@@ -8,7 +8,9 @@
 <body>
     <#include "cabecalho.ftlh">
     <#if erro??>
-        <p class="erro">${erro}</p>
+        <div style="color: red; margin-bottom: 15px; font-weight: bold;">
+            <span>${erro}</span>
+        </div>
     </#if>
     <form action="/sugestoes" method="post">
         <label for="nomeCliente">Nome do cliente:</label>

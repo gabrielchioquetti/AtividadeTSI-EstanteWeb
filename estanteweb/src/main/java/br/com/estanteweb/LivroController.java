@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class LivroController {
@@ -45,8 +48,15 @@ public class LivroController {
     }
 
     @GetMapping(value = "/livros/html")
-    public String paginaDesafio(Model model){
-        model.addAttribute("livros", livroRepository.listarTodos());
+    public String paginaDesafio(Model model,
+            @RequestParam(required = false) String ordem) {
+
+        if (ordem != null && !ordem.isBlank()) {
+            model.addAttribute("livros", livroRepository.listarOrdenadoPor(ordem));
+        } else {
+            model.addAttribute("livros", livroRepository.listarTodos());
+        }
+
         return "livros";
     }
 
@@ -75,4 +85,55 @@ public class LivroController {
         return "Requisição recebida de: " + userAgent;
     }
 
+    @GetMapping("/livros/novo")
+    public String cadastroLivro(){
+        return "livro-novo";
+    }
+
+    @PostMapping("/livros")
+    public String novoLivro(Model model, @RequestParam String titulo, @RequestParam String autor, @RequestParam int ano, @RequestParam double preco){
+        
+        if (titulo.isBlank()) {
+            model.addAttribute("erro", "Informe o titulo do livro.");
+            model.addAttribute("autor", autor);
+            model.addAttribute("ano", ano);
+            model.addAttribute("preco", preco);
+            return "livro-novo";
+        }else if(autor.isBlank()){
+            model.addAttribute("erro", "Informe o nome do autor.");
+            model.addAttribute("titulo", titulo);
+            model.addAttribute("ano", ano);
+            model.addAttribute("preco", preco);
+            return "livro-novo";
+        }else if (preco <= 0) {
+            model.addAttribute("erro", "O preço tem que ser maior que 0.");
+            model.addAttribute("titulo", titulo);
+            model.addAttribute("autor", autor);
+            model.addAttribute("ano", ano);
+            return "livro-novo";
+        }
+
+        Livro livro = new Livro();
+        livro.setTitulo(titulo);
+        livro.setAutor(autor);
+        livro.setAno(ano);
+        livro.setPreco(preco);
+
+        livroRepository.salvar(livro);
+
+        return "redirect:/livros/html";
+    }
+
+    @GetMapping("/livros/{id}")
+    public String detalhesLivro(@PathVariable Long id, Model model){
+        Livro livro = livroRepository.buscarPorId(id);
+
+        if (livro == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        model.addAttribute("livro", livro);
+        model.addAttribute("outrosLivros", livroRepository.listarDoMesmoAutor(livro.getAutor(), livro.getId()));
+        return "livro";
+    }
 }

@@ -13,7 +13,7 @@
     <#else>
         <ul>
             <#list livros as livro>
-                <li>${livro.titulo}, de ${livro.autor} e valor R$ ${livro.preco?c}</li>
+                <li>${livro.titulo}, de ${livro.autor} e valor R$ ${livro.preco} (<a href="/livros/${livro.id?c}">Ver detalhes</a>)</li>
             </#list>
         </ul>
     </#if>
