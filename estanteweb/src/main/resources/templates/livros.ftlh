@@ -7,16 +7,34 @@
 </head>
 <body>
     <#include "cabecalho.ftlh">
+
+    <a href="/livros/novo">Novo Livro</a>
+
     <h2>Acervo EstanteWeb: </h2>
+
     <#if livros?size == 0>
         <p>Nenhum livro no acervo no momento</p>
     <#else>
         <ul>
             <#list livros as livro>
-                <li>${livro.titulo}, de ${livro.autor} e valor R$ ${livro.preco} (<a href="/livros/${livro.id?c}">Ver detalhes</a>)</li>
+                <li>
+                    ${livro.titulo}, de ${livro.autor}
+                    e valor R$ ${livro.preco}
+
+                    (<a href="/livros/${livro.id?c}">Ver detalhes</a>)
+
+                    <form
+                        method="post"
+                        action="/livros/${livro.id?c}/excluir"
+                        style="display: inline;"
+                        onsubmit="return confirm('Deseja realmente excluir este livro?');">
+
+                        <button type="submit">Excluir</button>
+                    </form>
+                </li>
             </#list>
         </ul>
     </#if>
-    
+
 </body>
 </html>

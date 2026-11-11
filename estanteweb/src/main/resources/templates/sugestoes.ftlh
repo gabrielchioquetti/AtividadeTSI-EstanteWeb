@@ -12,6 +12,8 @@
         <p class="enviada">Sugestão enviada com sucesso!</p>
     </#if>
 
+    <a href="/sugestoes/nova">Nova Sugestão</a>
+
     <h2>Sugestões recebidas:</h2>
 
     <ul>
