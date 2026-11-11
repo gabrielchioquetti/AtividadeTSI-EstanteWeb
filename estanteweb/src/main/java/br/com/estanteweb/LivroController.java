@@ -198,6 +198,13 @@ public class LivroController {
 
     @PostMapping("/livros/{id}/excluir")
     public String excluir(@PathVariable Long id) {
+        
+        Livro livro = livroRepository.buscarPorId(id);
+        
+        if (livro == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        
         livroRepository.excluir(id);
         return "redirect:/livros/html";
     }
