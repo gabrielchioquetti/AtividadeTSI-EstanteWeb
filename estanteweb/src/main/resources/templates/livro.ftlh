@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Detalhes do Livro</title>
 </head>
 <body>
     <#include "cabecalho.ftlh">
@@ -12,13 +12,10 @@
     <p>Ano: ${livro.ano?c}</p>
     <p>Valor: R$ ${livro.preco?c}</p>
     <a href="/livros/html">Voltar para o acervo</a>
-    <br>
-    <a href="/livro/${livro.id?c}/editar" style="display: inline-block;
-          padding: 10px 20px;
-          background-color: #187000;
-          color: white;
-          text-decoration: none;
-          border-radius: 5px;">Editar</a>
+    <a href="/livros/${livro.id?c}/editar">Editar</a>
+    <a href="/livros/${livro.id?c}/excluir">
+        Excluir Livro
+    </a>
 
     <#if outrosLivros?? && outrosLivros?has_content>
         <h2>Outros livros do mesmo autor</h2>

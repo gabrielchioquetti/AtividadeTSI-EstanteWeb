@@ -17,7 +17,7 @@
         </div>
     </#if>
 
-    <form method="post" action="/livro/${livro.id?c}">
+    <form method="post" action="/livros/${livro.id?c}">
         <label for="titulo">Título:</label>
         <input id="titulo" name="titulo" type="text"
                value="${livro.titulo}" required>

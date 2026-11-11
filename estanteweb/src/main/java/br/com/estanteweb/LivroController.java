@@ -137,7 +137,7 @@ public class LivroController {
         return "livro";
     }
 
-    @GetMapping("/livro/{id}/editar")
+    @GetMapping("/livros/{id}/editar")
     public String editar(@PathVariable Long id, Model model) {
         Livro livro = livroRepository.buscarPorId(id);
         if (livro == null) {
@@ -148,7 +148,7 @@ public class LivroController {
     }
 
     
-    @PostMapping("/livro/{id}")
+    @PostMapping("/livros/{id}")
     public String salvarEdicao(@PathVariable Long id, @RequestParam String titulo, @RequestParam String autor, @RequestParam int ano, @RequestParam double preco, Model model) {
 
         Livro livro = livroRepository.buscarPorId(id);
@@ -184,6 +184,22 @@ public class LivroController {
         livroRepository.atualizar(livro);
 
         return "redirect:/livros/" + id;
+    }
+
+    @GetMapping("/livros/{id}/excluir")
+    public String confirmarExclusao(@PathVariable Long id, Model model) {
+        Livro livro = livroRepository.buscarPorId(id);
+        if (livro == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        model.addAttribute("livro", livro);
+        return "livro-excluir";
+    }
+
+    @PostMapping("/livros/{id}/excluir")
+    public String excluir(@PathVariable Long id) {
+        livroRepository.excluir(id);
+        return "redirect:/livros/html";
     }
 
 }

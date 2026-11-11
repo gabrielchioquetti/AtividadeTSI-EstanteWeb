@@ -112,4 +112,9 @@ public class LivroRepository {
 
         jdbcTemplate.update(sql, livro.getTitulo(), livro.getAutor(), livro.getAno(), livro.getPreco(), livro.getId());
     }
+
+    public void excluir(Long id) {
+        String sql = "DELETE FROM livro WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+    }
 }
