@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-@Repository 
+@Repository
 public class SugestaoRepository {
 
     @Autowired
@@ -29,15 +29,41 @@ public class SugestaoRepository {
         List<Map<String, Object>> linhas = jdbcTemplate.queryForList(sql);
 
         List<Sugestao> resultado = new ArrayList<>();
-        for (Map<String, Object> linha : linhas){
+        for (Map<String, Object> linha : linhas) {
             resultado.add(Sugestao.deMap(linha));
         }
 
         return resultado;
     }
 
-    public void salvar(Sugestao sugestao){
+    public void salvar(Sugestao sugestao) {
         String sql = "INSERT INTO sugestao (nome_cliente, livro_sugerido) VALUES (?, ?)";
         jdbcTemplate.update(sql, sugestao.getNomeCliente(), sugestao.getLivroSugerido());
+    }
+
+    public Sugestao buscarPorId(Long id) {
+        String sql = "SELECT * FROM sugestao WHERE id = ?";
+        List<Map<String, Object>> linhas = jdbcTemplate.queryForList(sql, id);
+
+        if (linhas.isEmpty()) {
+            return null;
+        }
+
+        return Sugestao.deMap(linhas.get(0));
+    }
+
+    public void atualizar(Sugestao sugestao) {
+        String sql = "UPDATE sugestao SET nome_cliente = ?, livro_sugerido = ? WHERE id = ?";
+        jdbcTemplate.update(
+            sql,
+            sugestao.getNomeCliente(),
+            sugestao.getLivroSugerido(),
+            sugestao.getId()
+        );
+    }
+
+    public void excluir(Long id) {
+        String sql = "DELETE FROM sugestao WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 }

@@ -3,17 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sugestões recebidas</title>
 </head>
 <body>
     <#include "cabecalho.ftlh">
+
     <#if enviada?? && enviada>
         <p class="enviada">Sugestão enviada com sucesso!</p>
     </#if>
+
     <h2>Sugestões recebidas:</h2>
+
     <ul>
         <#list sugestoes as sugestao>
-            <li>Cliente: ${sugestao.nomeCliente}, Livro Sugerido: ${sugestao.livroSugerido}</li>
+            <li>
+                Cliente: ${sugestao.nomeCliente},
+                Livro Sugerido: ${sugestao.livroSugerido}
+
+                <a href="/sugestoes/${sugestao.id?c}/editar">
+                    Editar
+                </a>
+
+                <a href="/sugestoes/${sugestao.id?c}/excluir">
+                    Excluir
+                </a>
+            </li>
         </#list>
     </ul>
 </body>
