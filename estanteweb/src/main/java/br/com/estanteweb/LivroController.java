@@ -136,4 +136,54 @@ public class LivroController {
         model.addAttribute("outrosLivros", livroRepository.listarDoMesmoAutor(livro.getAutor(), livro.getId()));
         return "livro";
     }
+
+    @GetMapping("/livro/{id}/editar")
+    public String editar(@PathVariable Long id, Model model) {
+        Livro livro = livroRepository.buscarPorId(id);
+        if (livro == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        model.addAttribute("livro", livro);
+        return "livro-editar";
+    }
+
+    
+    @PostMapping("/livro/{id}")
+    public String salvarEdicao(@PathVariable Long id, @RequestParam String titulo, @RequestParam String autor, @RequestParam int ano, @RequestParam double preco, Model model) {
+
+        Livro livro = livroRepository.buscarPorId(id);
+        
+        if (livro == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        livro.setId(id);
+        livro.setTitulo(titulo);
+        livro.setAutor(autor);
+        livro.setAno(ano);
+        livro.setPreco(preco);
+
+        if (titulo.isBlank()) {
+            model.addAttribute("erro", "Informe o título do livro.");
+            model.addAttribute("livro", livro);
+            return "livro-editar";
+        }
+
+        if (autor.isBlank()) {
+            model.addAttribute("erro", "Informe o nome do autor.");
+            model.addAttribute("livro", livro);
+            return "livro-editar";
+        }
+
+        if (preco <= 0) {
+            model.addAttribute("erro", "O preço tem que ser maior que 0.");
+            model.addAttribute("livro", livro);
+            return "livro-editar";
+        }
+
+        livroRepository.atualizar(livro);
+
+        return "redirect:/livros/" + id;
+    }
+
 }
