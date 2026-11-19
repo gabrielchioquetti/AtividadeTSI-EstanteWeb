@@ -7,18 +7,18 @@
 </head>
 <body>
     <#include "cabecalho.ftlh">
-    <h1>Título: ${livro.titulo}</h1>
+    <h2>Título: ${livro.titulo}</h2>
     <p>Autor: ${livro.autor}</p>
     <p>Ano: ${livro.ano?c}</p>
     <p>Valor: R$ ${livro.preco?c}</p>
     <a href="/livros/html">Voltar para o acervo</a>
-    <a href="/livros/${livro.id?c}/editar">Editar</a>
-    <a href="/livros/${livro.id?c}/excluir">
-        Excluir Livro
-    </a>
+    <#if usuarioLogado??>
+        <a href="/livros/${livro.id?c}/editar">Editar</a>
+        <a href="/livros/${livro.id?c}/excluir">Excluir Livro</a>
+    </#if>
 
     <#if outrosLivros?? && outrosLivros?has_content>
-        <h2>Outros livros do mesmo autor</h2>
+        <h3>Outros livros do mesmo autor</h3>
 
         <ul>
             <#list outrosLivros as outro>

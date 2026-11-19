@@ -7,7 +7,7 @@
 </head>
 <body>
     <#include "cabecalho.ftlh">
-    <h1>Cadastro de livro</h1>
+    <h2>Cadastro de livro</h2>
 
     <#if erro??>
         <div style="color: red; margin-bottom: 15px; font-weight: bold;">

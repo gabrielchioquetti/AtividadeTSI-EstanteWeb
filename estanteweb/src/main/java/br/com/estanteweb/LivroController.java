@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class LivroController {
 
@@ -23,7 +25,7 @@ public class LivroController {
 
     @GetMapping("/livros")
     @ResponseBody
-    public String paginaLivros(){
+    public String paginaLivros() {
         String detalheLivro = "Acervo EstanteWeb: ";
         for (Livro livro : livroRepository.listarTodos()) {
             detalheLivro += livro.getTitulo() + ", de " + livro.getAutor() + ", publicado em " + livro.getAno() + " (R$ " + livro.getPreco() + ") | ";
@@ -33,13 +35,13 @@ public class LivroController {
 
     @GetMapping("/livros/total")
     @ResponseBody
-    public String livrosTotal(){
+    public String livrosTotal() {
         return "O acervo tem " + livroRepository.contarLivros() + " livros";
     }
 
     @GetMapping("/livros/valor-total")
     @ResponseBody
-    public String somarValorAcervo(){
+    public String somarValorAcervo() {
         Double total = livroRepository.somarValorAcervo();
         if (total == null) {
             total = 0.0;
@@ -47,7 +49,7 @@ public class LivroController {
         return "O valor total do acervo é R$ " + String.format("%.2f", total);
     }
 
-    @GetMapping(value = "/livros/html")
+    @GetMapping("/livros/html")
     public String paginaDesafio(Model model,
             @RequestParam(required = false) String ordem) {
 
@@ -61,15 +63,15 @@ public class LivroController {
     }
 
     @GetMapping("/livros/busca")
-    public ResponseEntity<String> buscaLivro(@RequestParam(defaultValue = "999") double precoMaximo){
+    public ResponseEntity<String> buscaLivro(@RequestParam(defaultValue = "999") double precoMaximo) {
         List<Livro> livros = livroRepository.listarAtePreco(precoMaximo);
-        
-        if(livros.isEmpty()){
+
+        if (livros.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhum livro encontrado com o preço máximo de: " + precoMaximo);
         }
-        
+
         String detalheLivro = "Acervo EstanteWeb: ";
-        
+
         for (Livro livro : livros) {
             detalheLivro += livro.getTitulo() + ", de " + livro.getAutor() + ", publicado em " + livro.getAno() + " (R$ " + livro.getPreco() + ") | ";
         }
@@ -81,31 +83,42 @@ public class LivroController {
 
     @GetMapping("/livros/quem-acessa")
     @ResponseBody
-    public String quemAcessa(@RequestHeader("User-Agent") String userAgent){
+    public String quemAcessa(@RequestHeader("User-Agent") String userAgent) {
         return "Requisição recebida de: " + userAgent;
     }
 
     @GetMapping("/livros/novo")
-    public String cadastroLivro(){
+    public String cadastroLivro(HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+
         return "livro-novo";
     }
 
     @PostMapping("/livros")
-    public String novoLivro(Model model, @RequestParam String titulo, @RequestParam String autor, @RequestParam int ano, @RequestParam double preco){
-        
+    public String novoLivro(Model model, @RequestParam String titulo,
+            @RequestParam String autor, @RequestParam int ano,
+            @RequestParam double preco, HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+
         if (titulo.isBlank()) {
             model.addAttribute("erro", "Informe o titulo do livro.");
             model.addAttribute("autor", autor);
             model.addAttribute("ano", ano);
             model.addAttribute("preco", preco);
             return "livro-novo";
-        }else if(autor.isBlank()){
+        } else if (autor.isBlank()) {
             model.addAttribute("erro", "Informe o nome do autor.");
             model.addAttribute("titulo", titulo);
             model.addAttribute("ano", ano);
             model.addAttribute("preco", preco);
             return "livro-novo";
-        }else if (preco <= 0) {
+        } else if (preco <= 0) {
             model.addAttribute("erro", "O preço tem que ser maior que 0.");
             model.addAttribute("titulo", titulo);
             model.addAttribute("autor", autor);
@@ -125,7 +138,7 @@ public class LivroController {
     }
 
     @GetMapping("/livros/{id}")
-    public String detalhesLivro(@PathVariable Long id, Model model){
+    public String detalhesLivro(@PathVariable Long id, Model model) {
         Livro livro = livroRepository.buscarPorId(id);
 
         if (livro == null) {
@@ -138,21 +151,33 @@ public class LivroController {
     }
 
     @GetMapping("/livros/{id}/editar")
-    public String editar(@PathVariable Long id, Model model) {
+    public String editar(@PathVariable Long id, Model model, HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+
         Livro livro = livroRepository.buscarPorId(id);
+
         if (livro == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+
         model.addAttribute("livro", livro);
         return "livro-editar";
     }
 
-    
     @PostMapping("/livros/{id}")
-    public String salvarEdicao(@PathVariable Long id, @RequestParam String titulo, @RequestParam String autor, @RequestParam int ano, @RequestParam double preco, Model model) {
+    public String salvarEdicao(@PathVariable Long id, @RequestParam String titulo,
+            @RequestParam String autor, @RequestParam int ano,
+            @RequestParam double preco, Model model, HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
 
         Livro livro = livroRepository.buscarPorId(id);
-        
+
         if (livro == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
@@ -187,26 +212,36 @@ public class LivroController {
     }
 
     @GetMapping("/livros/{id}/excluir")
-    public String confirmarExclusao(@PathVariable Long id, Model model) {
+    public String confirmarExclusao(@PathVariable Long id, Model model, HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+
         Livro livro = livroRepository.buscarPorId(id);
+
         if (livro == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+
         model.addAttribute("livro", livro);
         return "livro-excluir";
     }
 
     @PostMapping("/livros/{id}/excluir")
-    public String excluir(@PathVariable Long id) {
-        
+    public String excluir(@PathVariable Long id, HttpSession session) {
+
+        if (session.getAttribute("usuarioLogado") == null) {
+            return "redirect:/login";
+        }
+
         Livro livro = livroRepository.buscarPorId(id);
-        
+
         if (livro == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        
+
         livroRepository.excluir(id);
         return "redirect:/livros/html";
     }
-
 }

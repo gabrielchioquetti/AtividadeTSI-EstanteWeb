@@ -8,7 +8,9 @@
 <body>
     <#include "cabecalho.ftlh">
 
-    <a href="/livros/novo">Novo Livro</a>
+    <#if usuarioLogado??>
+        <a href="/livros/novo">Novo Livro</a>
+    </#if>
 
     <h2>Acervo EstanteWeb: </h2>
 

@@ -8,11 +8,11 @@
 <body>
     <#include "cabecalho.ftlh">
 
-    <h1>Confirmar exclusão</h1>
+    <h2>Confirmar exclusão</h2>
 
     <p>Tem certeza de que deseja excluir este livro?</p>
 
-    <h2>${livro.titulo}</h2>
+    <h3>${livro.titulo}</h3>
     <p>Autor: ${livro.autor}</p>
     <p>Ano: ${livro.ano?c}</p>
     <p>Valor: R$ ${livro.preco?c}</p>

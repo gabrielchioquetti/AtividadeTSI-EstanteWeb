@@ -9,7 +9,7 @@
 <body>
     <#include "cabecalho.ftlh">
 
-    <h1>Editar Livro</h1>
+    <h2>Editar Livro</h2>
 
     <#if erro??>
         <div style="color: red; margin-bottom: 15px; font-weight: bold;">
